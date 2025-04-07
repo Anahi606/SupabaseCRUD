@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { supabase } from '../supabaseConfig';
 
 const FormContainer = styled.div`
   background-color: #d1bec4;
@@ -42,8 +43,25 @@ const GameForm = ({ gameToEdit, onSave }) => {
   const [title, setTitle] = useState(gameToEdit ? gameToEdit.title : '');
   const [description, setDescription] = useState(gameToEdit ? gameToEdit.description : '');
   const [imageUrl, setImageUrl] = useState(gameToEdit ? gameToEdit.imageUrl : '');
-  const [comments, setComments] = useState(gameToEdit ? gameToEdit.comments.join(', ') : '');
-  const [rating, setRating] = useState(gameToEdit ? gameToEdit.rating : '');
+  const [comments, setComments] = useState(gameToEdit ? gameToEdit.comments?.join(', ') : '');
+  const [rating, setRating] = useState(gameToEdit ? gameToEdit.rating?.toString() : '');
+
+  const saveGame = async (newGame) => {
+    const { data, error } = gameToEdit
+      ? await supabase
+          .from('Games')
+          .update(newGame)
+          .eq('id', gameToEdit.id)
+      : await supabase.from('Games').insert([newGame]);
+
+    if (error) {
+      console.error('Error guardando el juego:', error.message);
+    } else {
+        console.log("gameform.js",data);
+      onSave(newGame);
+      resetForm();
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -51,19 +69,28 @@ const GameForm = ({ gameToEdit, onSave }) => {
       title,
       description,
       imageUrl,
-      comments: comments.split(',').map((comment) => comment.trim()),
-      rating,
+      comments: comments ? comments.split(',').map((comment) => comment.trim()) : [],
+      rating: rating ? parseFloat(rating) : null,
     };
-    onSave(newGame);
+    console.log("GameForm.js",newGame);
+    saveGame(newGame);
+  };
+
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setImageUrl('');
+    setComments('');
+    setRating('');
   };
 
   useEffect(() => {
     if (gameToEdit) {
-      setTitle(gameToEdit.title);
-      setDescription(gameToEdit.description);
-      setImageUrl(gameToEdit.imageUrl);
-      setComments(gameToEdit.comments.join(', '));
-      setRating(gameToEdit.rating);
+      setTitle(gameToEdit.title || '');
+      setDescription(gameToEdit.description || '');
+      setImageUrl(gameToEdit.imageUrl || '');
+      setComments(gameToEdit.comments?.join(', ') || '');
+      setRating(gameToEdit.rating !== null ? gameToEdit.rating.toString() : '');
     }
   }, [gameToEdit]);
 
@@ -98,6 +125,9 @@ const GameForm = ({ gameToEdit, onSave }) => {
           value={rating}
           onChange={(e) => setRating(e.target.value)}
           placeholder="Puntuación"
+          min="0"
+          max="10"
+          step="0.1"
         />
         <Button type="submit">{gameToEdit ? 'Actualizar Juego' : 'Agregar Juego'}</Button>
       </form>

@@ -44,6 +44,8 @@ const Button = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-right: 8px;
+  margin-top: 8px;
 
   &:hover {
     background-color: #0056b3;
@@ -51,22 +53,33 @@ const Button = styled.button`
 `;
 
 const GameItem = ({ game, onDelete, onEdit }) => {
+  const handleEditClick = (gameId) => {
+    window.scrollTo(0, 0);
+    onEdit(gameId);
+  };
+
   return (
     <GameContainer>
-      <Title>{game.title}</Title>
-      <Description>{game.description}</Description>
-      <Image src={game.imageUrl} alt={game.title} />
+      <Title>{game.title || 'Sin título'}</Title>
+      <Description>{game.description || 'No hay descripción disponible'}</Description>
+      {game.imageUrl ? (
+        <Image src={game.imageUrl} alt={game.title || 'Imagen del juego'} />
+      ) : (
+        <p>No hay imagen disponible</p>
+      )}
       <Comments>
         <strong>Comentarios:</strong>
         <ul>
-          {game.comments.map((comment, index) => (
-            <li key={index}>{comment}</li>
-          ))}
+          {game.comments && game.comments.length > 0 ? (
+            game.comments.map((comment, index) => <p key={index}>{comment}</p>)
+          ) : (
+            <p>No hay comentarios disponibles</p>
+          )}
         </ul>
       </Comments>
-      <Rating>Rating: {game.rating}/5</Rating>
+      <Rating>Rating: {game.rating !== null ? game.rating : 'N/A'}/5</Rating>
       <div>
-        <Button onClick={() => onEdit(game.id)}>Editar</Button>
+        <Button onClick={() => handleEditClick(game.id)}>Editar</Button>
         <Button onClick={() => onDelete(game.id)}>Eliminar</Button>
       </div>
     </GameContainer>
