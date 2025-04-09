@@ -24,7 +24,7 @@ Este proyecto fue creado con el objetivo de practicar el desarrollo de interface
 Sigue los pasos a continuación para ejecutar el proyecto localmente:
 
 1. Clona el repositorio:
-   git clone 
+   git clone https://github.com/Anahi606/SupabaseCRUD
    O descargalo manualmente como zip y descomprimelo.
 2. Navega a la carpeta del proyecto:
    cd SupabaseCRUD
