@@ -18,7 +18,6 @@ Este proyecto fue creado con el objetivo de practicar el desarrollo de interface
 - [Uso del Proyecto](#uso-del-proyecto)
 - [Estructura del Proyecto](#estructura-del-proyecto)
 - [Créditos](#créditos)
-- [Licencia](#licencia)
 
 ## Instalación
 
