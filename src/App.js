@@ -1,12 +1,18 @@
-import logo from './logo.svg';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
+import Login from './components/crud/Login';
 import Game from './components/crud/Game';
 
 function App() {
   return (
-    <div className="App">
-      <Game/>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/game" element={<Game />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
