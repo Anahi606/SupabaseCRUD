@@ -1,46 +1,89 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { supabase } from '../supabaseConfig';
 
-const FormContainer = styled.div`
-  background-color: #d1bec4;
-  padding: 20px;
-  margin: 20px 0;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-`;
-
-const Input = styled.input`
+const Background = styled.div`
+  background: linear-gradient(135deg, #1B8AF1, #B58DED);
+  height: 100vh;
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-`;
-
-const Button = styled.button`
-  background-color: #007bff;
-  color: #fff;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-const Toggle = styled.p`
   text-align: center;
-  margin-top: 10px;
-  cursor: pointer;
-  color: #007bff;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
 
-  &:hover {
-    text-decoration: underline;
-  }
+const Title = styled.h4`
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: bold;
+  font-size: 35px;
+  margin-top: 4rem;
+  margin-bottom: 2rem;
+`;
+
+const LoginBox = styled.div`
+  display: inline-block;
+  background: #FFFFFF;
+  width: 434px;
+  height: 700px;
+  border-radius: 22px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
+              0 6px 20px rgba(0, 0, 0, 0.19);
+`;
+
+const StyledForm = styled.form`
+  display: inline-block;
+  align-items: center;
+  height: 270px;
+  width: 350px;
+  margin-bottom: 170px;
+`;
+
+const InputContainer = styled.div`
+  align-content: center;
+  border-radius: 22px;
+  margin-bottom: 35px;
+  width: 100%;
+  height: 64px;
+  background: white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2),
+              0 0 20px rgba(0, 0, 0, 0.19);
+`;
+
+const TextInput = styled.input`
+  margin-top: 1.2rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  border: none;
+  width: 80%;
+  outline: none;
+`;
+
+const StyledButton = styled.button`
+  margin-top: 28px;
+  width: 165px;
+  height: 60px;
+  border-radius: 30px;
+  background: #B58DED;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  color: #FFFFFF;
+  box-shadow: 0 4px 8px rgba(181, 141, 237, 0.7),
+              0 6px 20px rgba(181, 141, 237, 0.9);
+  cursor: pointer;
+`;
+
+const LinkText = styled.a`
+  color: #0E4579;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: 18px;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+  margin-top: 10px;
 `;
 
 const ErrorMessage = styled.p`
@@ -52,9 +95,9 @@ const ErrorMessage = styled.p`
 const Login = ({ onAuthSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
-  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -71,7 +114,6 @@ const Login = ({ onAuthSuccess }) => {
       setErrorMsg(result.error.message);
     } else {
       onAuthSuccess?.(result.data);
-      console.log("uwu", result.data.session.access_token);
       if (isLogin && result.data.session?.access_token) {
         localStorage.setItem('access_token', result.data.session.access_token);
         navigate('/game');
@@ -80,31 +122,40 @@ const Login = ({ onAuthSuccess }) => {
   };
 
   return (
-    <FormContainer>
-      <form onSubmit={handleAuth}>
-        <Input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Correo electrónico"
-          required
-        />
-        <Input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña"
-          required
-        />
-        {errorMsg && <ErrorMessage>{errorMsg}</ErrorMessage>}
-        <Button type="submit">{isLogin ? 'Iniciar sesión' : 'Registrarse'}</Button>
-        <Toggle onClick={() => setIsLogin(!isLogin)}>
-          {isLogin
-            ? '¿No tienes una cuenta? Regístrate'
-            : '¿Ya tienes una cuenta? Inicia sesión'}
-        </Toggle>
-      </form>
-    </FormContainer>
+    <Background>
+      <LoginBox>
+        <Title>{isLogin ? 'Iniciar sesión' : 'Registro'}</Title>
+        <StyledForm onSubmit={handleAuth}>
+          <InputContainer>
+            <TextInput
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Correo electrónico"
+              required
+            />
+          </InputContainer>
+          <InputContainer>
+            <TextInput
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Contraseña"
+              required
+            />
+          </InputContainer>
+          {errorMsg && <ErrorMessage>{errorMsg}</ErrorMessage>}
+          <StyledButton type="submit">
+            {isLogin ? 'Iniciar sesión' : 'Registrarse'}
+          </StyledButton>
+          <LinkText onClick={() => setIsLogin(!isLogin)}>
+            {isLogin
+              ? '¿No tienes una cuenta? Regístrate'
+              : '¿Ya tienes una cuenta? Inicia sesión'}
+          </LinkText>
+        </StyledForm>
+      </LoginBox>
+    </Background>
   );
 };
 
