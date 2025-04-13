@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GlobalStyle from '../styles/GlobalStyle';
 import GameForm from './GameForm';
 import GameList from './GameList';
@@ -7,6 +8,7 @@ import { supabase } from '../supabaseConfig';
 const Games = () => {
   const [games, setGames] = useState([]);
   const [gameToEdit, setGameToEdit] = useState(null);
+  const navigate = useNavigate();
 
   const fetchGames = async () => {
     const { data, error } = await supabase.from('Games').select('*');
@@ -22,7 +24,6 @@ const Games = () => {
   }, []);
 
   const handleSaveGame = (game) => {
-    console.log("Game.js",game);
     if (!game) {
       console.error('Game object is null or undefined');
       return;
@@ -30,7 +31,7 @@ const Games = () => {
 
     if (gameToEdit) {
       const updateGame = async () => {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('Games')
           .update(game)
           .eq('id', gameToEdit.id);
@@ -43,9 +44,8 @@ const Games = () => {
       };
       updateGame();
     } else {
-        console.log("If game.js");
-        const refetchGame=async()=>{await fetchGames()};
-        refetchGame();
+      const refetchGame = async () => { await fetchGames(); };
+      refetchGame();
     }
   };
 
@@ -63,10 +63,22 @@ const Games = () => {
     setGameToEdit(game);
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error al intentar salir de cuenta:', error.message);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <div>
       <GlobalStyle />
-      <h1>Gestión de Videojuegos</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>Gestión de Videojuegos</h1>
+        <button onClick={handleLogout}>Cerrar sesión</button>
+      </div>
       <GameForm gameToEdit={gameToEdit} onSave={handleSaveGame} />
       <GameList games={games} onDelete={handleDeleteGame} onEdit={handleEditGame} />
     </div>
