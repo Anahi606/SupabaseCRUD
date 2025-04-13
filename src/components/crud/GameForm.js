@@ -1,41 +1,119 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { supabase } from '../supabaseConfig';
 
-const FormContainer = styled.div`
-  background-color: #d1bec4;
-  padding: 20px;
-  margin: 20px 0;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+const Container = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
+`;
+
+const FormWrapper = styled.div`
+  max-width: 700px;
+  width: 100%;
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+`;
+
+const Title = styled.h2`
+  font-size: 25px;
+  font-weight: 500;
+  position: relative;
+  margin-bottom: 20px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 30px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+  }
+`;
+
+const Form = styled.form`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+`;
+
+const InputBox = styled.div`
+  margin-bottom: 15px;
+  width: calc(100% / 2 - 20px);
+
+  @media (max-width: 584px) {
+    width: 100%;
+  }
+`;
+
+const Label = styled.span`
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
 `;
 
 const Input = styled.input`
+  height: 45px;
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding-left: 15px;
+  border: 1px solid #ccc;
+  border-bottom-width: 2px;
+  transition: all 0.3s ease;
+
+  &:focus,
+  &:valid {
+    border-color: #9b59b6;
+  }
 `;
 
 const TextArea = styled.textarea`
+  height: 100px;
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-bottom-width: 2px;
+  transition: all 0.3s ease;
+  resize: none;
+
+  &:focus,
+  &:valid {
+    border-color: #9b59b6;
+  }
+`;
+
+const ButtonBox = styled.div`
+  width: 100%;
+  margin: 35px 0 0 0;
 `;
 
 const Button = styled.button`
-  background-color: #007bff;
-  color: #fff;
-  padding: 8px 12px;
+  height: 45px;
+  width: 100%;
+  border-radius: 5px;
   border: none;
-  border-radius: 4px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
   cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
 
   &:hover {
-    background-color: #0056b3;
+    background: linear-gradient(-135deg, #71b7e6, #9b59b6);
   }
 `;
 
@@ -46,18 +124,22 @@ const GameForm = ({ gameToEdit, onSave }) => {
   const [comments, setComments] = useState(gameToEdit ? gameToEdit.comments?.join(', ') : '');
   const [rating, setRating] = useState(gameToEdit ? gameToEdit.rating?.toString() : '');
 
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setImageUrl('');
+    setComments('');
+    setRating('');
+  };
+
   const saveGame = async (newGame) => {
-    const { data, error } = gameToEdit
-      ? await supabase
-          .from('Games')
-          .update(newGame)
-          .eq('id', gameToEdit.id)
+    const { error } = gameToEdit
+      ? await supabase.from('Games').update(newGame).eq('id', gameToEdit.id)
       : await supabase.from('Games').insert([newGame]);
 
     if (error) {
       console.error('Error guardando el juego:', error.message);
     } else {
-        console.log("gameform.js",data);
       onSave(newGame);
       resetForm();
     }
@@ -69,69 +151,48 @@ const GameForm = ({ gameToEdit, onSave }) => {
       title,
       description,
       imageUrl,
-      comments: comments ? comments.split(',').map((comment) => comment.trim()) : [],
-      rating: rating ? parseFloat(rating) : null,
+      comments: comments.split(',').map(c => c.trim()),
+      rating: parseFloat(rating),
     };
-    console.log("GameForm.js",newGame);
     saveGame(newGame);
   };
 
-  const resetForm = () => {
-    setTitle('');
-    setDescription('');
-    setImageUrl('');
-    setComments('');
-    setRating('');
-  };
-
-  useEffect(() => {
-    if (gameToEdit) {
-      setTitle(gameToEdit.title || '');
-      setDescription(gameToEdit.description || '');
-      setImageUrl(gameToEdit.imageUrl || '');
-      setComments(gameToEdit.comments?.join(', ') || '');
-      setRating(gameToEdit.rating !== null ? gameToEdit.rating.toString() : '');
-    }
-  }, [gameToEdit]);
-
   return (
-    <FormContainer>
-      <form onSubmit={handleSubmit}>
-        <Input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Título del juego"
-        />
-        <TextArea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Descripción"
-        />
-        <Input
-          type="text"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="URL de la imagen"
-        />
-        <Input
-          type="text"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          placeholder="Comentarios (separados por coma)"
-        />
-        <Input
-          type="number"
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
-          placeholder="Puntuación"
-          min="0"
-          max="10"
-          step="0.1"
-        />
-        <Button type="submit">{gameToEdit ? 'Actualizar Juego' : 'Agregar Juego'}</Button>
-      </form>
-    </FormContainer>
+    <Container>
+      <FormWrapper>
+        <Title>Registrar Juego</Title>
+        <Form onSubmit={handleSubmit}>
+          <InputBox>
+            <Label>Título</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </InputBox>
+
+          <InputBox>
+            <Label>URL de Imagen</Label>
+            <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} required />
+          </InputBox>
+
+          <InputBox style={{ width: '100%' }}>
+            <Label>Descripción</Label>
+            <TextArea value={description} onChange={(e) => setDescription(e.target.value)} required />
+          </InputBox>
+
+          <InputBox>
+            <Label>Comentarios</Label>
+            <Input value={comments} onChange={(e) => setComments(e.target.value)} />
+          </InputBox>
+
+          <InputBox>
+            <Label>Calificación</Label>
+            <Input type="number" value={rating} onChange={(e) => setRating(e.target.value)} />
+          </InputBox>
+
+          <ButtonBox>
+            <Button type="submit">Guardar Juego</Button>
+          </ButtonBox>
+        </Form>
+      </FormWrapper>
+    </Container>
   );
 };
 

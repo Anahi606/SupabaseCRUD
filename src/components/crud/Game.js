@@ -1,12 +1,44 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GlobalStyle from '../styles/GlobalStyle';
 import GameForm from './GameForm';
 import GameList from './GameList';
 import { supabase } from '../supabaseConfig';
+import styled from 'styled-components';
 
+const Header = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 30px;
+    color: BLACK;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  button {
+    background-color: #9b59b6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    margin-left: 20px;
+
+    &:hover {
+      background-color: #71b7e6;
+    }
+  }
+`;
 const Games = () => {
   const [games, setGames] = useState([]);
   const [gameToEdit, setGameToEdit] = useState(null);
+  const navigate = useNavigate();
 
   const fetchGames = async () => {
     const { data, error } = await supabase.from('Games').select('*');
@@ -22,7 +54,6 @@ const Games = () => {
   }, []);
 
   const handleSaveGame = (game) => {
-    console.log("Game.js",game);
     if (!game) {
       console.error('Game object is null or undefined');
       return;
@@ -30,7 +61,7 @@ const Games = () => {
 
     if (gameToEdit) {
       const updateGame = async () => {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('Games')
           .update(game)
           .eq('id', gameToEdit.id);
@@ -43,9 +74,8 @@ const Games = () => {
       };
       updateGame();
     } else {
-        console.log("If game.js");
-        const refetchGame=async()=>{await fetchGames()};
-        refetchGame();
+      const refetchGame = async () => { await fetchGames(); };
+      refetchGame();
     }
   };
 
@@ -63,10 +93,24 @@ const Games = () => {
     setGameToEdit(game);
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error al intentar salir de cuenta:', error.message);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <div>
       <GlobalStyle />
-      <h1>Gestión de Videojuegos</h1>
+      <Header>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1>Gestión de Videojuegos</h1>
+          <button onClick={handleLogout}>Cerrar sesión</button>
+      </div>
+      </Header>
       <GameForm gameToEdit={gameToEdit} onSave={handleSaveGame} />
       <GameList games={games} onDelete={handleDeleteGame} onEdit={handleEditGame} />
     </div>
