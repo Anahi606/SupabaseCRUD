@@ -72,5 +72,7 @@ El proyecto está organizado de la siguiente manera:
 
 ## Créditos
 https://www.youtube.com/watch?v=tW1HO7i9EIM&t=745s
+
 https://www.codingnepalweb.com/responsive-registration-form-in-html-css/
+
 https://medium.com/@kenaszogara/tutorial-create-simple-login-form-with-reactjs-31965ed3ccfa
