@@ -1,15 +1,18 @@
 # Libreria de juego CRUD Supabase + React
 
-Una aplicación web CRUD que permite gestionar una biblioteca de videojuegos. Desarrollada con React y Supabase, permite crear, visualizar, editar y eliminar juegos que se almacenan en una base de datos remota. Cada juego cuenta con título, descripción, URL de imagen, comentarios y calificación.
+Este proyecto es una aplicación web construida con React y Supabase que permite a los usuarios registrarse, iniciar sesión y gestionar una lista de videojuegos. Los usuarios pueden crear, leer, editar y eliminar juegos, así como acceder únicamente a ciertas rutas si están autenticados. La información se almacena y gestiona mediante Supabase.
 
 ## Descripción del Proyecto
 
-Este proyecto fue creado con el objetivo de practicar el desarrollo de interfaces modernas con React y la integración de bases de datos en la nube usando Supabase. La aplicación aborda la necesidad de tener una herramienta sencilla para gestionar una colección de videojuegos, incluyendo funciones para:
+Esta aplicación tiene como objetivo demostrar cómo construir un sistema completo CRUD (Create, Read, Update, Delete) utilizando React para el frontend y Supabase como backend-as-a-service. Además, incorpora un sistema de autenticación que restringe el acceso a rutas protegidas para usuarios no autenticados.
 
-- Agregar nuevos juegos con sus respectivos detalles
-- Editar los datos existentes
-- Eliminar juegos
-- Visualizar los juegos
+Permite a los usuarios:
+- Registrarse y crear una cuenta.
+- Iniciar sesión y cerrar sesión.
+- Crear nuevos juegos con título, descripción, imagen, comentarios y calificaciones.
+- Editar o eliminar juegos existentes.
+- Ver la lista de juegos.
+- Acceder solo a rutas protegidas si han iniciado sesión correctamente.
   
 
 ## Tabla de Contenidos
@@ -17,6 +20,7 @@ Este proyecto fue creado con el objetivo de practicar el desarrollo de interface
 - [Instalación](#instalación)
 - [Uso del Proyecto](#uso-del-proyecto)
 - [Estructura del Proyecto](#estructura-del-proyecto)
+- [Características](#características)
 - [Créditos](#créditos)
 
 ## Instalación
@@ -40,10 +44,13 @@ Sigue los pasos a continuación para ejecutar el proyecto localmente:
 ## Uso del Proyecto
 Una vez iniciado el proyecto, podrás:
 
+- Regístrate con un correo electrónico y una contraseña válidos.
+- Inicia sesión para acceder al panel principal.
 - Crear un nuevo juego llenando un formulario con los campos requeridos.
 - Editar los detalles de un juego existente.
 - Eliminar cualquier juego registrado.
 - Visualizar la lista completa de juegos almacenados.
+- Cerrar sesión.
 
 Cada entrada incluye:
 - title: Título del juego
@@ -54,9 +61,16 @@ Cada entrada incluye:
 
 ## Estructura del Proyecto
 El proyecto está organizado de la siguiente manera:
-![image](https://github.com/user-attachments/assets/e0bffaf8-c559-4ab3-92c2-91cd7d9ce9d8)
+
+![image](https://github.com/user-attachments/assets/02f727e0-430d-4d43-a27e-9304692d8ee8)
+
+## Características
+- Autenticación de usuarios (registro, login, logout).
+- Protección de rutas según el estado de autenticación.
+- CRUD de juegos con título, descripción, imagen, comentarios y calificaciones.
+- Gestión del estado con React Hooks
 
 ## Créditos
 https://www.youtube.com/watch?v=tW1HO7i9EIM&t=745s
-
-
+https://www.codingnepalweb.com/responsive-registration-form-in-html-css/
+https://medium.com/@kenaszogara/tutorial-create-simple-login-form-with-reactjs-31965ed3ccfa
