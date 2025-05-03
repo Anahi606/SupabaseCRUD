@@ -104,27 +104,84 @@ const AddButton = styled.button`
 const PriceTable = ({ gameId, pages, prices, onPricesChange }) => {
   const [selectedPage, setSelectedPage] = useState('');
   const [price, setPrice] = useState('');
+  const [pageNames, setPageNames] = useState({});
+  const [gamePrices, setGamePrices] = useState([]);
+
+  useEffect(() => {
+    const fetchPageNames = async () => {
+      const { data, error } = await supabase
+        .from('Pages')
+        .select('id, nameWeb');
+
+      if (error) {
+        console.error('Error fetching page names:', error.message);
+      } else {
+        const namesMap = {};
+        data.forEach(page => {
+          namesMap[page.id] = page.nameWeb;
+        });
+        setPageNames(namesMap);
+      }
+    };
+
+    const fetchGamePrices = async () => {
+      const { data, error } = await supabase
+        .from('Prices')
+        .select('*')
+        .eq('gameid', gameId);
+
+      if (error) {
+        console.error('Error fetching game prices:', error.message);
+      } else {
+        setGamePrices(data);
+        onPricesChange(data);
+      }
+    };
+
+    fetchPageNames();
+    fetchGamePrices();
+  }, [gameId]);
 
   const handleAddPrice = async () => {
     if (!selectedPage || !price) return;
 
-    const { error } = await supabase
-      .from('Prices')
-      .insert([{ gameid: gameId, pageid: selectedPage, price: parseFloat(price) }]);
+    // Verificar si ya existe un precio para esta página
+    const existingPrice = gamePrices.find(p => p.pageid === selectedPage);
 
-    if (error) {
-      console.error('Error adding price:', error.message);
+    if (existingPrice) {
+      // Actualizar el precio existente
+      const { data, error } = await supabase
+        .from('Prices')
+        .update({ price: parseFloat(price) })
+        .eq('id', existingPrice.id)
+        .select();
+
+      if (error) {
+        console.error('Error updating price:', error.message);
+      } else {
+        const updatedPrices = gamePrices.map(p => 
+          p.id === existingPrice.id ? data[0] : p
+        );
+        setGamePrices(updatedPrices);
+        onPricesChange(updatedPrices);
+        setSelectedPage('');
+        setPrice('');
+      }
     } else {
-      const newPrice = {
-        id: Date.now(), // Temporary ID until we get the real one from the database
-        gameid: gameId,
-        pageid: selectedPage,
-        price: parseFloat(price),
-        page: pages.find(p => p.id === selectedPage)
-      };
-      onPricesChange([...prices, newPrice]);
-      setSelectedPage('');
-      setPrice('');
+      // Crear un nuevo precio
+      const { data, error } = await supabase
+        .from('Prices')
+        .insert([{ gameid: gameId, pageid: selectedPage, price: parseFloat(price) }])
+        .select();
+
+      if (error) {
+        console.error('Error adding price:', error.message);
+      } else {
+        setGamePrices([...gamePrices, data[0]]);
+        onPricesChange([...gamePrices, data[0]]);
+        setSelectedPage('');
+        setPrice('');
+      }
     }
   };
 
@@ -137,7 +194,9 @@ const PriceTable = ({ gameId, pages, prices, onPricesChange }) => {
     if (error) {
       console.error('Error deleting price:', error.message);
     } else {
-      onPricesChange(prices.filter(p => p.id !== priceId));
+      const updatedPrices = gamePrices.filter(p => p.id !== priceId);
+      setGamePrices(updatedPrices);
+      onPricesChange(updatedPrices);
     }
   };
 
@@ -153,9 +212,9 @@ const PriceTable = ({ gameId, pages, prices, onPricesChange }) => {
           </tr>
         </thead>
         <tbody>
-          {prices.map((price) => (
+          {gamePrices.map((price) => (
             <TableRow key={price.id}>
-              <TableCell>{price.page?.nameWeb || 'Página no encontrada'}</TableCell>
+              <TableCell>{pageNames[price.pageid] || 'Página no encontrada'}</TableCell>
               <TableCell>${price.price.toFixed(2)}</TableCell>
               <TableCell>
                 <DeleteButton onClick={() => handleDeletePrice(price.id)}>
