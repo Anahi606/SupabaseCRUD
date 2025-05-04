@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { supabase } from '../supabaseConfig';
 import PriceTable from './PriceTable';
+import Modal from './Modal';
 
 const FormWrapper = styled.div`
   width: 100%;
@@ -125,6 +126,15 @@ const Button = styled.button`
   }
 `;
 
+const ErrorMessage = styled.div`
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+`;
+
 const GameForm = ({ gameToEdit, onSave, onClose, categories, pages }) => {
   const [title, setTitle] = useState(gameToEdit ? gameToEdit.title : '');
   const [description, setDescription] = useState(gameToEdit ? gameToEdit.description : '');
@@ -133,6 +143,8 @@ const GameForm = ({ gameToEdit, onSave, onClose, categories, pages }) => {
   const [rating, setRating] = useState(gameToEdit ? gameToEdit.rating?.toString() : '');
   const [categoryId, setCategoryId] = useState(gameToEdit ? gameToEdit.category_id : '');
   const [prices, setPrices] = useState([]);
+  const [error, setError] = useState(null);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
   useEffect(() => {
     if (gameToEdit) {
@@ -172,7 +184,9 @@ const GameForm = ({ gameToEdit, onSave, onClose, categories, pages }) => {
         .eq('id', gameToEdit.id);
       
       if (error) {
-        console.error('Error updating game:', error.message);
+        console.log(error, "error");
+        setError(error);
+        setIsErrorModalOpen(true);
         return;
       }
       gameId = gameToEdit.id;
@@ -183,7 +197,9 @@ const GameForm = ({ gameToEdit, onSave, onClose, categories, pages }) => {
         .select();
       
       if (error) {
-        console.error('Error creating game:', error.message);
+        console.log(error, "error");
+        setError(error);
+        setIsErrorModalOpen(true);
         return;
       }
       gameId = data[0].id;
@@ -220,63 +236,84 @@ const GameForm = ({ gameToEdit, onSave, onClose, categories, pages }) => {
   };
 
   return (
-    <FormWrapper>
-      <Title>{gameToEdit ? 'Editar Juego' : 'Registrar Juego'}</Title>
-      <Form onSubmit={handleSubmit}>
-        <InputBox>
-          <Label>Título</Label>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
-        </InputBox>
+    <>
+      <FormWrapper>
+        <Title>{gameToEdit ? 'Editar Juego' : 'Registrar Juego'}</Title>
+        <Form onSubmit={handleSubmit}>
+          <InputBox>
+            <Label>Título</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </InputBox>
 
-        <InputBox>
-          <Label>URL de Imagen</Label>
-          <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} required />
-        </InputBox>
+          <InputBox>
+            <Label>URL de Imagen</Label>
+            <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} required />
+          </InputBox>
 
-        <InputBox style={{ width: '100%' }}>
-          <Label>Descripción</Label>
-          <TextArea value={description} onChange={(e) => setDescription(e.target.value)} required />
-        </InputBox>
+          <InputBox style={{ width: '100%' }}>
+            <Label>Descripción</Label>
+            <TextArea value={description} onChange={(e) => setDescription(e.target.value)} required />
+          </InputBox>
 
-        <InputBox>
-          <Label>Categoría</Label>
-          <Select 
-            value={categoryId} 
-            onChange={(e) => setCategoryId(e.target.value)}
-            required
-          >
-            <option value="">Seleccione una categoría</option>
-            {categories && categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </Select>
-        </InputBox>
+          <InputBox>
+            <Label>Categoría</Label>
+            <Select 
+              value={categoryId} 
+              onChange={(e) => setCategoryId(e.target.value)}
+              required
+            >
+              <option value="">Seleccione una categoría</option>
+              {categories && categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </Select>
+          </InputBox>
 
-        <InputBox>
-          <Label>Comentarios</Label>
-          <Input value={comments} onChange={(e) => setComments(e.target.value)} />
-        </InputBox>
+          <InputBox>
+            <Label>Comentarios</Label>
+            <Input value={comments} onChange={(e) => setComments(e.target.value)} />
+          </InputBox>
 
-        <InputBox>
-          <Label>Calificación</Label>
-          <Input type="number" value={rating} onChange={(e) => setRating(e.target.value)} />
-        </InputBox>
+          <InputBox>
+            <Label>Calificación</Label>
+            <Input 
+              type="number" 
+              value={rating} 
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '' || (parseFloat(value) >= 0 && parseFloat(value) <= 5)) {
+                  setRating(value);
+                }
+              }}
+              min="0"
+              max="5"
+              step="0.1"
+            />
+          </InputBox>
 
-        <ButtonBox>
-          <Button type="submit">Guardar Juego</Button>
-        </ButtonBox>
-      </Form>
-      {gameToEdit && (
-        <PriceTable
-          gameId={gameToEdit.id}
-          pages={pages}
-          prices={prices}
-          onPricesChange={setPrices}
-        />
-      )}
-    </FormWrapper>
+          <ButtonBox>
+            <Button type="submit">Guardar Juego</Button>
+          </ButtonBox>
+        </Form>
+        {gameToEdit && (
+          <PriceTable
+            gameId={gameToEdit.id}
+            pages={pages}
+            prices={prices}
+            onPricesChange={setPrices}
+          />
+        )}
+      </FormWrapper>
+
+      <Modal isOpen={isErrorModalOpen} onClose={() => setIsErrorModalOpen(false)}>
+        <ErrorMessage>
+          <h3>Error {error?.code}</h3>
+          <p>{error?.details || error?.message}</p>
+        </ErrorMessage>
+      </Modal>
+    </>
   );
 };
 
