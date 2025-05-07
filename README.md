@@ -1,6 +1,6 @@
 # Libreria de juego CRUD Supabase + React
 
-Este proyecto es una aplicación web construida con React y Supabase que permite a los usuarios registrarse, iniciar sesión y gestionar una lista de videojuegos. Los usuarios pueden crear, leer, editar y eliminar juegos, así como acceder únicamente a ciertas rutas si están autenticados. La información se almacena y gestiona mediante Supabase.
+Este proyecto es una aplicación web con React + Supabase que permite a los usuarios registrarse, iniciar sesión y gestionar una biblioteca de videojuegos. Integra autenticación, operaciones CRUD y visualización comparativa de precios de juegos entre distintas tiendas ficticias. Los administradores pueden gestionar juegos, categorías y sitios web directamente desde la plataforma.
 
 ## Descripción del Proyecto
 
@@ -10,7 +10,7 @@ Permite a los usuarios:
 - Registrarse y crear una cuenta.
 - Iniciar sesión y cerrar sesión.
 - Crear nuevos juegos con título, descripción, imagen, comentarios y calificaciones.
-- Editar o eliminar juegos existentes.
+- Editar, crear o borrar categorías, páginas o juegos.
 - Ver la lista de juegos.
 - Acceder solo a rutas protegidas si han iniciado sesión correctamente.
   
@@ -50,6 +50,7 @@ Una vez iniciado el proyecto, podrás:
 - Editar los detalles de un juego existente.
 - Eliminar cualquier juego registrado.
 - Visualizar la lista completa de juegos almacenados.
+- Editar, crear o borrar categorías/páginas.
 - Cerrar sesión.
 
 Cada entrada incluye:
@@ -58,17 +59,22 @@ Cada entrada incluye:
 - imageUrl: Enlace a la imagen del juego
 - comments: Comentarios del usuario
 - ratings: Calificación del juego
+- category: Categoria del juego
+- price: precio del juego en una página
 
 ## Estructura del Proyecto
 El proyecto está organizado de la siguiente manera:
 
-![image](https://github.com/user-attachments/assets/02f727e0-430d-4d43-a27e-9304692d8ee8)
+![image](https://github.com/user-attachments/assets/cdb29302-4e6e-40d1-be80-d2be8c87288a)
+
 
 ## Características
 - Autenticación de usuarios (registro, login, logout).
 - Protección de rutas según el estado de autenticación.
 - CRUD de juegos con título, descripción, imagen, comentarios y calificaciones.
 - Gestión del estado con React Hooks
+- Comparación de precios por juego entre páginas ficticias.
+- Filtro por categoría.
 
 ## Créditos
 https://www.youtube.com/watch?v=tW1HO7i9EIM&t=745s
