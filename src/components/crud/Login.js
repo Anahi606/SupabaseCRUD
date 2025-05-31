@@ -116,7 +116,8 @@ const Login = ({ onAuthSuccess }) => {
       onAuthSuccess?.(result.data);
       if (isLogin && result.data.session?.access_token) {
         localStorage.setItem('access_token', result.data.session.access_token);
-        navigate('/game');
+        //refresh the page
+        window.location.reload();
       }
     }
   };
