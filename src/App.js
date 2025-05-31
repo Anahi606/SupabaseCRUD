@@ -5,6 +5,7 @@ import Login from './components/crud/Login';
 import Game from './components/crud/Game';
 import { supabase } from './components/supabaseConfig';
 import NotAuthorized from './components/NotAuthorized';
+import GameDetails from './components/GameDetails';
 
 function AppWrapper() {
   const navigate = useNavigate();
@@ -42,10 +43,12 @@ function AppWrapper() {
       const role = roleData?.isAdmin ? 'admin' : 'user';
       setUserRole(role);
 
-      if (role === 'user') {
+      if (role === 'user' && location.pathname == '/') {
+        console.log('User role detected, navigating to /not-authorized');
         navigate('/not-authorized');
       }
-      if (role === 'admin') {
+      if (role === 'admin' && location.pathname == '/') {
+        console.log('Admin role detected, navigating to /game');
         navigate('/game');
       }
 
@@ -75,6 +78,7 @@ function AppWrapper() {
           } 
         />
         <Route path="/not-authorized" element={<NotAuthorized />} />
+        <Route path="/game/:id" element={<GameDetails />} />
       </Routes>
     </div>
   );

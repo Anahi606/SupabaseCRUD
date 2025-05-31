@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseConfig';
+import { supabase } from './supabaseConfig';
 import styled from 'styled-components';
 
 const Container = styled.div`
