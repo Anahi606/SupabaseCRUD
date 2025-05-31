@@ -147,11 +147,11 @@ const Games = () => {
 
         <GamesGrid>
           {filteredGames.map(game => (
-            <GameCard key={game.id}>
-              <img src={game.imageUrl || 'https://via.placeholder.com/240x240'} alt={game.title} />
-              <h3>{game.title}</h3>
-              <p>{game.minPrice ? `$${game.minPrice.toFixed(2)}` : 'No disponible'}</p>
-            </GameCard>
+            <GameCard key={game.id} onClick={() => navigate(`/game/${game.id}`)} style={{ cursor: 'pointer' }}>
+            <img src={game.imageUrl} alt={game.title} />
+            <h3>{game.title}</h3>
+            <p>{game.minPrice ? `$${game.minPrice.toFixed(2)}` : 'No disponible'}</p>
+          </GameCard>
           ))}
         </GamesGrid>
       </Container>

@@ -126,9 +126,9 @@ const PriceTable = ({ gameId, pages, prices, onPricesChange }) => {
 
     const fetchGamePrices = async () => {
       const { data, error } = await supabase
-        .from('Prices')
+        .from('Prices_by_pages')
         .select('*')
-        .eq('gameid', gameId);
+        .eq('idgame', gameId);
 
       if (error) {
         console.error('Error fetching game prices:', error.message);
@@ -144,50 +144,48 @@ const PriceTable = ({ gameId, pages, prices, onPricesChange }) => {
 
   const handleAddPrice = async () => {
     if (!selectedPage || !price) return;
-
-    // Verificar si ya existe un precio para esta página
-    const existingPrice = gamePrices.find(p => p.pageid === selectedPage);
+  
+    const existingPrice = gamePrices.find(p => p.idpage == selectedPage);
+    console.log('selectedPage', selectedPage);
+    console.log('gamePrices', gamePrices);
+    console.log('existingPrice', existingPrice);
 
     if (existingPrice) {
-      // Actualizar el precio existente
-      const { data, error } = await supabase
-        .from('Prices')
-        .update({ price: parseFloat(price) })
-        .eq('id', existingPrice.id)
-        .select();
-
-      if (error) {
-        console.error('Error updating price:', error.message);
-      } else {
-        const updatedPrices = gamePrices.map(p => 
-          p.id === existingPrice.id ? data[0] : p
-        );
-        setGamePrices(updatedPrices);
-        onPricesChange(updatedPrices);
-        setSelectedPage('');
-        setPrice('');
-      }
-    } else {
-      // Crear un nuevo precio
-      const { data, error } = await supabase
-        .from('Prices')
-        .insert([{ gameid: gameId, pageid: selectedPage, price: parseFloat(price) }])
-        .select();
-
-      if (error) {
-        console.error('Error adding price:', error.message);
-      } else {
-        setGamePrices([...gamePrices, data[0]]);
-        onPricesChange([...gamePrices, data[0]]);
-        setSelectedPage('');
-        setPrice('');
+      // Eliminar el registro existente primero
+      const { error: deleteError } = await supabase
+        .from('Prices_by_pages')
+        .delete()
+        .eq('id', existingPrice.id);
+  
+      if (deleteError) {
+        console.error('Error deleting existing price before insert:', deleteError.message);
+        return;
       }
     }
+  
+    // Insertar nuevo registro
+    const { data, error } = await supabase
+      .from('Prices_by_pages')
+      .insert([{ idgame: gameId, idpage: selectedPage, price: parseFloat(price) }])
+      .select();
+  
+    if (error) {
+      console.error('Error adding price:', error.message);
+    } else {
+      const updatedPrices = existingPrice
+        ? [...gamePrices.filter(p => p.id !== existingPrice.id), data[0]]
+        : [...gamePrices, data[0]];
+      setGamePrices(updatedPrices);
+      onPricesChange(updatedPrices);
+      setSelectedPage('');
+      setPrice('');
+    }
   };
+  
 
   const handleDeletePrice = async (priceId) => {
     const { error } = await supabase
-      .from('Prices')
+      .from('Prices_by_pages')
       .delete()
       .eq('id', priceId);
 
@@ -214,7 +212,7 @@ const PriceTable = ({ gameId, pages, prices, onPricesChange }) => {
         <tbody>
           {gamePrices.map((price) => (
             <TableRow key={price.id}>
-              <TableCell>{pageNames[price.pageid] || 'Página no encontrada'}</TableCell>
+              <TableCell>{pageNames[price.idpage] || 'Página no encontrada'}</TableCell>
               <TableCell>${price.price.toFixed(2)}</TableCell>
               <TableCell>
                 <DeleteButton onClick={() => handleDeletePrice(price.id)}>
