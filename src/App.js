@@ -11,6 +11,7 @@ function AppWrapper() {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
+  const [isGameLoading, setIsGameLoading] = useState(true);
 
   useEffect(() => {
     const validateSession = async () => {
@@ -21,6 +22,7 @@ function AppWrapper() {
         console.log('No user or error:', error);
         if (location.pathname !== '/') navigate('/');
         setLoading(false);
+        setIsGameLoading(false);
         return;
       }
 
@@ -32,25 +34,27 @@ function AppWrapper() {
 
       if (roleError) {
         console.error('Error fetching role:', roleError);
-        navigate('/');
         setLoading(false);
+        setIsGameLoading(false);
         return;
       }
 
       const role = roleData?.isAdmin ? 'admin' : 'user';
       setUserRole(role);
 
-      if (role === 'admin' && location.pathname !== '/game') {
-        navigate('/game');
-      } else if (role === 'user' && location.pathname !== '/not-authorized') {
+      if (role === 'user') {
         navigate('/not-authorized');
+      }
+      if (role === 'admin') {
+        navigate('/game');
       }
 
       setLoading(false);
+      setIsGameLoading(false);
     };
 
     validateSession();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   if (loading) return null;
 
@@ -58,7 +62,18 @@ function AppWrapper() {
     <div className="App">
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/game" element={<Game />} />
+        <Route 
+          path="/game" 
+          element={
+            isGameLoading ? (
+              <div className="loading-container">
+                <div className="loading-spinner">Cargando...</div>
+              </div>
+            ) : (
+              <Game />
+            )
+          } 
+        />
         <Route path="/not-authorized" element={<NotAuthorized />} />
       </Routes>
     </div>
