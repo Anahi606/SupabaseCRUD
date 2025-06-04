@@ -9,10 +9,11 @@ Esta aplicación tiene como objetivo demostrar cómo construir un sistema comple
 Permite a los usuarios:
 - Registrarse y crear una cuenta.
 - Iniciar sesión y cerrar sesión.
-- Crear nuevos juegos con título, descripción, imagen, comentarios y calificaciones.
-- Editar, crear o borrar categorías, páginas o juegos.
+- Admin: Crear nuevos juegos con título, descripción, imagen, comentarios y calificaciones.
+- Admin: Editar, crear o borrar categorías, páginas o juegos.
 - Ver la lista de juegos.
 - Acceder solo a rutas protegidas si han iniciado sesión correctamente.
+- Visualizar los juegos y sus precios
   
 
 ## Tabla de Contenidos
@@ -46,11 +47,11 @@ Una vez iniciado el proyecto, podrás:
 
 - Regístrate con un correo electrónico y una contraseña válidos.
 - Inicia sesión para acceder al panel principal.
-- Crear un nuevo juego llenando un formulario con los campos requeridos.
-- Editar los detalles de un juego existente.
-- Eliminar cualquier juego registrado.
+- Admin: Crear un nuevo juego llenando un formulario con los campos requeridos.
+- Admin: Editar los detalles de un juego existente.
+- Admin: Eliminar cualquier juego registrado.
 - Visualizar la lista completa de juegos almacenados.
-- Editar, crear o borrar categorías/páginas.
+- Admin: Editar, crear o borrar categorías/páginas.
 - Cerrar sesión.
 
 Cada entrada incluye:
@@ -59,13 +60,13 @@ Cada entrada incluye:
 - imageUrl: Enlace a la imagen del juego
 - comments: Comentarios del usuario
 - ratings: Calificación del juego
-- category: Categoria del juego
+- category_id: Categoria del juego
 - price: precio del juego en una página
 
 ## Estructura del Proyecto
 El proyecto está organizado de la siguiente manera:
 
-![image](https://github.com/user-attachments/assets/cdb29302-4e6e-40d1-be80-d2be8c87288a)
+![image](https://github.com/user-attachments/assets/a66fc19a-88c4-4c55-b309-8393e6674a08)
 
 
 ## Características
@@ -75,6 +76,7 @@ El proyecto está organizado de la siguiente manera:
 - Gestión del estado con React Hooks
 - Comparación de precios por juego entre páginas ficticias.
 - Filtro por categoría.
+- Anuncios de juegos relacionados por categoría.
 
 ## Créditos
 https://www.youtube.com/watch?v=tW1HO7i9EIM&t=745s
