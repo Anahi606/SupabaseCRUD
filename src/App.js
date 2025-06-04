@@ -44,8 +44,8 @@ function AppWrapper() {
       setUserRole(role);
 
       if (role === 'user' && location.pathname == '/') {
-        console.log('User role detected, navigating to /not-authorized');
-        navigate('/not-authorized');
+        console.log('User role detected, navigating to /userPage');
+        navigate('/userPage');
       }
       if (role === 'admin' && location.pathname == '/') {
         console.log('Admin role detected, navigating to /game');
@@ -77,7 +77,7 @@ function AppWrapper() {
             )
           } 
         />
-        <Route path="/not-authorized" element={<NotAuthorized />} />
+        <Route path="/userPage" element={<NotAuthorized />} />
         <Route path="/game/:id" element={<GameDetails />} />
       </Routes>
     </div>

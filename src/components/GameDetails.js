@@ -170,8 +170,11 @@ const GameDetails = () => {
       )}
       <Container>
         <Title>{game.title}</Title>
+        <div style={{ marginBottom: 12 }}>
+          <span style={{ fontWeight: 'bold' }}>Rating:</span> {game.rating}
+        </div>
         <Image src={game.imageUrl} alt={game.title} />
-        <Description>{game.description}</Description>
+        <Description><span style={{ fontWeight: 'bold' }}>Descripcion:</span> {game.description}</Description>
 
         <h2>Precios en distintas páginas:</h2>
         <PriceTable>
