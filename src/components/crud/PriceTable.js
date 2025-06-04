@@ -151,7 +151,6 @@ const PriceTable = ({ gameId, pages, prices, onPricesChange }) => {
     console.log('existingPrice', existingPrice);
 
     if (existingPrice) {
-      // Eliminar el registro existente primero
       const { error: deleteError } = await supabase
         .from('Prices_by_pages')
         .delete()
@@ -163,7 +162,6 @@ const PriceTable = ({ gameId, pages, prices, onPricesChange }) => {
       }
     }
   
-    // Insertar nuevo registro
     const { data, error } = await supabase
       .from('Prices_by_pages')
       .insert([{ idgame: gameId, idpage: selectedPage, price: parseFloat(price) }])

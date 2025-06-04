@@ -205,7 +205,6 @@ const GameForm = ({ gameToEdit, onSave, onClose, categories, pages }) => {
       gameId = data[0].id;
     }
 
-    // Update prices
     const currentPriceIds = prices.map(p => p.id);
     const { error: deleteError } = await supabase
       .from('Prices')
