@@ -106,10 +106,23 @@ const GameDetails = () => {
   const [relatedGame, setRelatedGame] = useState(null);
   const [relatedPrice, setRelatedPrice] = useState(null);
   const [showPopup, setShowPopup] = useState(true);
+  const [relatedAdCount, setRelatedAdCount] = useState(0);
+
+  const fetchRelatedAdCount = async (relatedGameId) => {
+    const { count, error } = await supabase
+      .from('ContadorAnuncios')
+      .select('*', { count: 'exact', head: true })
+      .eq('related_game_id', relatedGameId);
+    if (!error) setRelatedAdCount(count);
+  };
 
   useEffect(() => {
     const fetchDetails = async () => {
-      const { data: gameData } = await supabase.from('Games').select('*').eq('id', id).single();
+      const { data: gameData } = await supabase
+        .from('Games')
+        .select('*')
+        .eq('id', id)
+        .single();
       setGame(gameData);
 
       const { data: priceData, error } = await supabase
@@ -129,14 +142,32 @@ const GameDetails = () => {
           .limit(1);
 
         if (relatedGames && relatedGames.length > 0) {
-          setRelatedGame(relatedGames[0]);
+          const rg = relatedGames[0];
+          setRelatedGame(rg);
+
           const { data: relatedPrices } = await supabase
             .from('Prices_by_pages')
             .select('*, Pages(nameWeb, url)')
-            .eq('idgame', relatedGames[0].id);
+            .eq('idgame', rg.id);
+
           if (relatedPrices && relatedPrices.length > 0) {
-            const minPrice = relatedPrices.reduce((min, curr) => parseFloat(curr.price) < parseFloat(min.price) ? curr : min, relatedPrices[0]);
+            const minPrice = relatedPrices.reduce((min, curr) =>
+              parseFloat(curr.price) < parseFloat(min.price) ? curr : min,
+              relatedPrices[0]
+            );
             setRelatedPrice(minPrice);
+            fetchRelatedAdCount(rg.id);
+
+            const key = `inserted_${id}_related_${rg.id}`;
+            if (!sessionStorage.getItem(key)) {
+              const { data: { user } } = await supabase.auth.getUser();
+              await supabase.from('ContadorAnuncios').insert({
+                game_id: parseInt(id),
+                related_game_id: rg.id,
+                user_id: user?.id || null
+              });
+              sessionStorage.setItem(key, 'true');
+            }
           }
         }
       }
@@ -159,6 +190,9 @@ const GameDetails = () => {
               ¿Te interesa también <b>{relatedGame.title}</b>?<br />
               Disponible en <b>{relatedPrice.Pages?.nameWeb}</b> por <span style={{ color: '#ff4d4f' }}>${parseFloat(relatedPrice.price).toFixed(2)}</span>
             </p>
+            <p style={{ marginTop: 8, fontSize: 14, color: '#ccc' }}>
+              Este anuncio se ha mostrado <b>{relatedAdCount}</b> veces.
+            </p>
             <PopupButton onClick={() => {
               setShowPopup(false);
               navigate(`/game/${relatedGame.id}`);
@@ -174,7 +208,7 @@ const GameDetails = () => {
           <span style={{ fontWeight: 'bold' }}>Rating:</span> {game.rating}
         </div>
         <Image src={game.imageUrl} alt={game.title} />
-        <Description><span style={{ fontWeight: 'bold' }}>Descripcion:</span> {game.description}</Description>
+        <Description><span style={{ fontWeight: 'bold' }}>Descripción:</span> {game.description}</Description>
 
         <h2>Precios en distintas páginas:</h2>
         <PriceTable>
